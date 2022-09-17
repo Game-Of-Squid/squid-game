@@ -31,11 +31,15 @@ const Game: React.FC = () => {
 
     setIsGreen(!isGreen);
     game.greenLight = !game.greenLight;
+    game.snapshot = {};
 
     if (!game.greenLight) {
+      // if the light is red
       // take a snapshot of all the poses
 
-      game.takeSnapshot();
+      setTimeout(() => {
+        game.takeSnapshot();
+      }, 1500);
     }
 
     playAudio(game.greenLight);
