@@ -1,134 +1,13 @@
-import * as poseDetection from "@tensorflow-models/pose-detection";
-import * as tf from "@tensorflow/tfjs-core";
-import "@tensorflow/tfjs-backend-webgl";
-// import "@tensorflow/tfjs-backend-wasm";
 import { useEffect } from "react";
-import Ola from "ola";
 import { useState } from "react";
-import { drawPose, drawText } from "../lib/helper";
-import { io } from "socket.io-client";
-import { getAngle } from "../lib/angle";
 import initializeCamera from "../lib/camera";
 import { useNavigate } from "react-router";
 import { initKeys, onKey } from "kontra";
 import playAudio from "../lib/audio";
 
-const socket = io("http://localhost:3030");
+import game from "../Game";
 
 const logo = require("../assets/images/squidgamelogo.png");
-
-const defaultWidth = 640;
-const defaultHeight = 480;
-
-let greenLight = true;
-let initialized = true;
-
-let video: HTMLVideoElement;
-let detector: poseDetection.PoseDetector;
-
-function initGame() {
-  // Video loop
-  var fps = 1000;
-  var now;
-  var then = performance.now();
-  var interval = 1000 / fps;
-  (window as any).delta = 0;
-
-  function loop() {
-    if (!initialized) return;
-
-    requestAnimationFrame(loop);
-
-    now = performance.now();
-    (window as any).delta = now - then;
-
-    if ((window as any).delta > interval) {
-      then = now - ((window as any).delta % interval);
-      update();
-    }
-  }
-  if (initialized) {
-    loop();
-  }
-}
-
-function drawPoses(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, poses: poseDetection.Pose[]) {
-  for (const pose of poses) {
-    let points = pose.keypoints;
-
-    const { angle, depth } = getAngle(points[5].x, points[6].x);
-    if (!greenLight) {
-      socket.emit("angle", angle);
-    }
-
-    const body: { [key: string]: poseDetection.Keypoint } = {};
-    const joints: { [key: string]: any } = {};
-
-    // Convert points to body joints
-    for (const p of points) {
-      if (!p.name) continue;
-      const id = p.name;
-
-      p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
-      p.y = p.y * (canvas.height / defaultHeight);
-      body[id] = p;
-
-      if (joints[id]) {
-        joints[id].x = body[id].x;
-        joints[id].y = body[id].y;
-      } else {
-        joints[id] = Ola({ x: body[id].x, y: body[id].y }, 50);
-      }
-    }
-
-    // Draw joints
-    drawPose(ctx, joints, body, depth);
-  }
-}
-
-// Update function
-async function update() {
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-  const ctx = canvas.getContext("2d");
-
-  if (!canvas || !ctx) {
-    console.error("Canvas not found");
-    return;
-  }
-
-  if (!video) {
-    drawText(ctx, "Loading camera...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
-    return;
-  }
-
-  let poses = await detector.estimatePoses(video);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawPoses(ctx, canvas, poses);
-
-  // Draw stats
-  drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 30, undefined, "white", "left", "top");
-  drawText(ctx, "# of poses: " + poses.length, 10, 60, undefined, "white", "left", "top");
-}
-
-export async function initializePoseDetection(canvas_: HTMLCanvasElement, video_: HTMLVideoElement) {
-  await tf.ready();
-
-  const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking: true };
-  detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-
-  if (!canvas_ || !video_) {
-    console.error("Unable to get canvas or video element");
-    return;
-  }
-
-  //? We could change this in the future
-  canvas_.width = 600;
-  canvas_.height = 480;
-
-  video = video_;
-}
 
 const Game: React.FC = () => {
   const [isGreen, setIsGreen] = useState(true);
@@ -136,14 +15,14 @@ const Game: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    initialized = true;
+    game.initialized = true;
 
     initKeys(); // initalize keyboard input
     initializeCamera();
-    initGame();
+    game.init();
 
     return () => {
-      initialized = false;
+      game.initialized = false;
     };
   }, []);
 
@@ -151,15 +30,15 @@ const Game: React.FC = () => {
     if (!isStarted) return;
 
     setIsGreen(!isGreen);
-    greenLight = !greenLight;
+    game.greenLight = !game.greenLight;
 
-    if (!greenLight) {
+    if (!game.greenLight) {
       // take a snapshot of all the poses
 
       console.log("taking snapshot");
     }
 
-    playAudio(greenLight);
+    playAudio(game.greenLight);
   };
 
   onKey(
@@ -174,7 +53,7 @@ const Game: React.FC = () => {
     setIsStarted(!isStarted);
 
     if (!isStarted) {
-      playAudio(greenLight);
+      playAudio(game.greenLight);
     }
   };
 

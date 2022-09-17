@@ -1,4 +1,4 @@
-import { initializePoseDetection } from "../components/Game";
+import game from "../Game";
 
 export default function initializeCamera() {
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -20,7 +20,7 @@ export default function initializeCamera() {
       return new Promise((resolve) => (video.onplaying = resolve));
     })
     .then(() => {
-      initializePoseDetection(canvas, video);
+      game.initializePoseDetection(canvas, video);
     })
     .catch(function (err0r) {
       console.log("Something went wrong!");
