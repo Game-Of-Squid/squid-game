@@ -75,7 +75,7 @@ export function drawLine(
   ctx.closePath();
 }
 
-export function drawPose(ctx: CanvasRenderingContext2D, joints: any, depth: number) {
+export function drawPose(ctx: CanvasRenderingContext2D, joints: any, depth: number, dead: boolean) {
   // SKELETON
   let nose = {
     x: joints["nose"].x,
@@ -103,28 +103,30 @@ export function drawPose(ctx: CanvasRenderingContext2D, joints: any, depth: numb
   };
 
   // Draw the skeleton
-  drawLine(ctx, joints["left_ear"].x, joints["left_ear"].y, joints["left_eye"].x, joints["left_eye"].y, "lime", 4);
-  drawLine(ctx, joints["left_eye"].x, joints["left_eye"].y, joints["nose"].x, joints["nose"].y, "lime", 4);
-  drawLine(ctx, joints["nose"].x, joints["nose"].y, joints["right_eye"].x, joints["right_eye"].y, "lime", 4);
-  drawLine(ctx, joints["right_eye"].x, joints["right_eye"].y, joints["right_ear"].x, joints["right_ear"].y, "lime", 4);
+  const limbColor = dead ? "red" : "lime";
 
-  drawLine(ctx, joints["left_wrist"].x, joints["left_wrist"].y, joints["left_elbow"].x, joints["left_elbow"].y, "lime", 4);
-  drawLine(ctx, joints["left_elbow"].x, joints["left_elbow"].y, joints["left_shoulder"].x, joints["left_shoulder"].y, "lime", 4);
+  drawLine(ctx, joints["left_ear"].x, joints["left_ear"].y, joints["left_eye"].x, joints["left_eye"].y, limbColor, 4);
+  drawLine(ctx, joints["left_eye"].x, joints["left_eye"].y, joints["nose"].x, joints["nose"].y, limbColor, 4);
+  drawLine(ctx, joints["nose"].x, joints["nose"].y, joints["right_eye"].x, joints["right_eye"].y, limbColor, 4);
+  drawLine(ctx, joints["right_eye"].x, joints["right_eye"].y, joints["right_ear"].x, joints["right_ear"].y, limbColor, 4);
 
-  drawLine(ctx, joints["right_wrist"].x, joints["right_wrist"].y, joints["right_elbow"].x, joints["right_elbow"].y, "lime", 4);
-  drawLine(ctx, joints["right_elbow"].x, joints["right_elbow"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, "lime", 4);
+  drawLine(ctx, joints["left_wrist"].x, joints["left_wrist"].y, joints["left_elbow"].x, joints["left_elbow"].y, limbColor, 4);
+  drawLine(ctx, joints["left_elbow"].x, joints["left_elbow"].y, joints["left_shoulder"].x, joints["left_shoulder"].y, limbColor, 4);
 
-  drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, "lime", 4);
-  drawLine(ctx, joints["left_hip"].x, joints["left_hip"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+  drawLine(ctx, joints["right_wrist"].x, joints["right_wrist"].y, joints["right_elbow"].x, joints["right_elbow"].y, limbColor, 4);
+  drawLine(ctx, joints["right_elbow"].x, joints["right_elbow"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, limbColor, 4);
 
-  drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
-  drawLine(ctx, joints["right_shoulder"].x, joints["right_shoulder"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+  drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, limbColor, 4);
+  drawLine(ctx, joints["left_hip"].x, joints["left_hip"].y, joints["right_hip"].x, joints["right_hip"].y, limbColor, 4);
 
-  drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
-  drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+  drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["left_hip"].x, joints["left_hip"].y, limbColor, 4);
+  drawLine(ctx, joints["right_shoulder"].x, joints["right_shoulder"].y, joints["right_hip"].x, joints["right_hip"].y, limbColor, 4);
 
-  drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_ankle"].x, joints["left_ankle"].y, "lime", 4);
-  drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_ankle"].x, joints["right_ankle"].y, "lime", 4);
+  drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_hip"].x, joints["left_hip"].y, limbColor, 4);
+  drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_hip"].x, joints["right_hip"].y, limbColor, 4);
+
+  drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_ankle"].x, joints["left_ankle"].y, limbColor, 4);
+  drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_ankle"].x, joints["right_ankle"].y, limbColor, 4);
 
   // Draw the joints
   for (let id of Object.keys(joints)) {
@@ -137,10 +139,12 @@ export function drawPose(ctx: CanvasRenderingContext2D, joints: any, depth: numb
   drawCircle(ctx, knee.x, knee.y, 5);
   drawCircle(ctx, foot.x, foot.y, 5);
 
-  drawLine(ctx, nose.x, nose.y, neck.x, neck.y, "white", 8);
-  drawLine(ctx, neck.x, neck.y, dick.x, dick.y, "white", 8);
-  drawLine(ctx, dick.x, dick.y, knee.x, knee.y, "white", 8);
-  drawLine(ctx, knee.x, knee.y, foot.x, foot.y, "white", 8);
+  const spineColor = dead ? "red" : "white";
+
+  drawLine(ctx, nose.x, nose.y, neck.x, neck.y, spineColor, 8);
+  drawLine(ctx, neck.x, neck.y, dick.x, dick.y, spineColor, 8);
+  drawLine(ctx, dick.x, dick.y, knee.x, knee.y, spineColor, 8);
+  drawLine(ctx, knee.x, knee.y, foot.x, foot.y, spineColor, 8);
 
   drawText(ctx, Math.round(depth) + " cm", nose.x, nose.y + 10 - 20 / (depth / 100), undefined, "aqua", "center");
 }

@@ -33,6 +33,10 @@ export class Game {
     }
   }
 
+  calculateThreshold(depth: number): number {
+    return (-5 / 4) * (depth / 100) + 15;
+  }
+
   checkThreshold() {
     if (this.greenLight || !Object.keys(this.snapshot).length) return;
 
@@ -40,17 +44,27 @@ export class Game {
       const pose = this.snapshot[id];
       const newPose = this.poses.find((p) => p.id === pose.id);
 
-      if (!newPose) continue;
+      if (!newPose || (pose as any).dead) continue;
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < pose.keypoints.length; i++) {
         const oldPoint = pose.keypoints[i];
         const newPoint = newPose.keypoints[i];
 
-        const { depth } = getAngle(pose.keypoints[5].x, pose.keypoints[6].x);
+        const { angle, depth } = getAngle(pose.keypoints[5].x, pose.keypoints[6].x);
 
         const dist = Math.sqrt(Math.pow(oldPoint.x - newPoint.x, 2) + Math.pow(oldPoint.y - newPoint.y, 2));
 
-        console.log(oldPoint.name, newPoint.name, dist, depth);
+        const threshold = this.calculateThreshold(depth);
+
+        // console.log(dist, depth, threshold);
+
+        if (dist > threshold && (newPoint.score || 0) > 0.5) {
+          (pose as any).dead = true;
+          console.log(`Player ${id} DEAD | Keypoint: ${newPoint.name}`);
+          socket.emit("angle", angle);
+
+          break;
+        }
       }
     }
   }
@@ -136,10 +150,7 @@ export class Game {
     for (const pose of this.poses) {
       let points = pose.keypoints;
 
-      const { angle, depth } = getAngle(points[5].x, points[6].x);
-      if (!this.greenLight) {
-        socket.emit("angle", angle);
-      }
+      const { depth } = getAngle(points[5].x, points[6].x);
 
       const joints: { [key: string]: any } = {};
 
@@ -160,7 +171,14 @@ export class Game {
       }
 
       // Draw joints
-      drawPose(ctx, joints, depth);
+      const id = pose.id;
+      let dead = false;
+      if (id) {
+        if ((this.snapshot[id] as any)?.dead) {
+          dead = true;
+        }
+      }
+      drawPose(ctx, joints, depth, dead);
     }
   }
 }
