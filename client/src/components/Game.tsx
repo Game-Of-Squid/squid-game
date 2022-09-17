@@ -56,7 +56,7 @@ const Game: React.FC = () => {
       playAudio(game.greenLight);
     } else {
       // TODO: stop the game
-      game.greenLight = true;
+      game.reset();
       setIsGreen(true);
     }
   };

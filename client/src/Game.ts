@@ -25,6 +25,12 @@ export class Game {
 
   constructor() {}
 
+  reset() {
+    this.greenLight = true;
+    this.poses = [];
+    this.snapshot = {};
+  }
+
   takeSnapshot() {
     this.snapshot = {};
     for (const pose of this.poses) {
@@ -58,7 +64,9 @@ export class Game {
 
         // console.log(dist, depth, threshold);
 
-        if (dist > threshold && (newPoint.score || 0) > 0.5) {
+        // check if the distance is greater than the threshold
+        // discard result if the predicted score for the keypoint is too low
+        if (dist > threshold && (newPoint.score || 0) > 0.2) {
           (pose as any).dead = true;
           console.log(`Player ${id} DEAD | Keypoint: ${newPoint.name}`);
           socket.emit("angle", angle);
