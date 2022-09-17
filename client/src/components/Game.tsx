@@ -72,7 +72,7 @@ async function update() {
   }
 
   if (!video) {
-    drawText(ctx, "Loading webcam...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
+    drawText(ctx, "Loading camera...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
     return;
   }
 
@@ -83,7 +83,7 @@ async function update() {
   for (const pose of poses) {
     let points = pose.keypoints;
 
-    const angle = getAngle(points[5].x, points[6].x);
+    const { angle, depth } = getAngle(points[5].x, points[6].x);
     if (!greenLight) {
       socket.emit("angle", angle);
     }
@@ -109,12 +109,12 @@ async function update() {
     }
 
     // Draw joints
-    drawPose(ctx, joints, body);
+    drawPose(ctx, joints, body, depth);
   }
 
   // Draw stats
-  drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
-  drawText(ctx, "# of poses: " + poses.length, 10, 70);
+  drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 30, undefined, "white", "left", "top");
+  drawText(ctx, "# of poses: " + poses.length, 10, 60, undefined, "white", "left", "top");
 }
 
 export async function startPosing(canvas_: HTMLCanvasElement, video_: HTMLVideoElement) {

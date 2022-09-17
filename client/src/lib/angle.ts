@@ -1,4 +1,4 @@
-export const getAngle = (lShoulder: number, rShoulder: number): number => {
+export const getAngle = (lShoulder: number, rShoulder: number) => {
   const xCenter: number = 300;
   const fullWidth: number = 600;
 
@@ -13,5 +13,5 @@ export const getAngle = (lShoulder: number, rShoulder: number): number => {
 
   const angle: number = Math.atan(distFromMiddle / depth) * (180 / Math.PI);
 
-  return angle;
+  return { angle, depth };
 };

@@ -75,7 +75,7 @@ export function drawLine(
   ctx.closePath();
 }
 
-export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any) {
+export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any, depth: number) {
   // SKELETON
   let nose = {
     x: body["nose"].x,
@@ -142,4 +142,6 @@ export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any) 
   drawLine(ctx, neck.x, neck.y, dick.x, dick.y, "white", 8);
   drawLine(ctx, dick.x, dick.y, knee.x, knee.y, "white", 8);
   drawLine(ctx, knee.x, knee.y, foot.x, foot.y, "white", 8);
+
+  drawText(ctx, Math.round(depth) + " cm", nose.x, nose.y + 10 - 20 / (depth / 100), undefined, "white", "center");
 }
