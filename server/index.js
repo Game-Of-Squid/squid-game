@@ -1,19 +1,16 @@
-// const SerialPort = require("serialport");
-// const Readline = require("@serialport/parser-readline");
+//Initialize SerialPort
+const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline');
 
-// console.log(SerialPort);
 
-// const port = new SerialPort("COM3", { baudRate: 9600 });
-// const parser = port.pipe(new Readline({ delimiter: "\n" }));
-// // Read the port data
-// port.on("open", () => {
-//   console.log("serial port open");
-// });
-// parser.on("data", (data) => {
-//   console.log("got word from arduino:", data);
-// });
+const port = new SerialPort('COM3', {baudRate: 9600});
 
-// port.write("Sending Data");
+const parser = new Readline();
+port.pipe(parser);
+
+// parser.on('data', (line) => console.log(line));
+
+
 
 // Initialize server variables
 const express = require("express");
@@ -59,7 +56,8 @@ io.on("connection", function (socket) {
   console.log("Connection made", new Date());
 
   socket.on("angle", (angle) => {
-    console.log(angle);
+    console.log('Sending angle to serial port');
+    port.write(angle);
   });
 
   socket.on("disconnect", () => {});
