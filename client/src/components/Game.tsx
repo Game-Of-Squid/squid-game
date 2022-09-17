@@ -74,8 +74,8 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
     return;
   }
 
-  canvas.width = 300;
-  canvas.height = 240;
+  canvas.width = 600;
+  canvas.height = 480;
 
   const ctx = canvas.getContext("2d");
 
@@ -92,108 +92,114 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (!poses[0]) return;
+    for (const pose of poses) {
+      let points = pose.keypoints;
+      let body: { [key: string]: poseDetection.Keypoint } = {};
 
-    console.log(poses);
+      // Convert points to body joints
 
-    let points = poses[0].keypoints;
-    let body: { [key: string]: poseDetection.Keypoint } = {};
-
-    // Convert points to body joints
-
-    currPoseData = [];
-    for (const p of points) {
-      if (!p.name) continue;
-      currPoseData.push(p.x / defaultWidth);
-      currPoseData.push(p.y / defaultHeight);
-      p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
-      p.y = p.y * (canvas.height / defaultHeight);
-      body[p.name] = p;
-    }
-
-    // Joints
-    for (let id of Object.keys(body)) {
-      if (joints[id]) {
-        joints[id].x = body[id].x;
-        joints[id].y = body[id].y;
-      } else {
-        joints[id] = Ola({ x: body[id].x, y: body[id].y }, 50);
+      currPoseData = [];
+      for (const p of points) {
+        if (!p.name) continue;
+        currPoseData.push(p.x / defaultWidth);
+        currPoseData.push(p.y / defaultHeight);
+        p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
+        p.y = p.y * (canvas.height / defaultHeight);
+        body[p.name] = p;
       }
+
+      // Joints
+      for (let id of Object.keys(body)) {
+        if (joints[id]) {
+          joints[id].x = body[id].x;
+          joints[id].y = body[id].y;
+        } else {
+          joints[id] = Ola({ x: body[id].x, y: body[id].y }, 50);
+        }
+      }
+
+      // SKELETON
+
+      let nose = {
+        x: body["nose"].x,
+        y: body["nose"].y,
+      };
+
+      let neck = {
+        x: (body["left_shoulder"].x + body["right_shoulder"].x) / 2,
+        y: (body["left_shoulder"].y + body["right_shoulder"].y) / 2,
+      };
+      neckArray.push(neck.y);
+
+      let dick = {
+        x: (body["left_hip"].x + body["right_hip"].x) / 2,
+        y: (body["left_hip"].y + body["right_hip"].y) / 2,
+      };
+
+      let knee = {
+        x: (body["left_knee"].x + body["right_knee"].x) / 2,
+        y: (body["left_knee"].y + body["right_knee"].y) / 2,
+      };
+
+      let foot = {
+        x: (body["left_ankle"].x + body["right_ankle"].x) / 2,
+        y: (body["left_ankle"].y + body["right_ankle"].y) / 2,
+      };
+
+      // Plank / Pushup
+
+      let xSpine = [body["left_shoulder"].x, body["left_hip"].x, body["left_knee"].x, body["left_ankle"].x];
+      let ySpine = [body["left_shoulder"].y, body["left_hip"].y, body["left_knee"].y, body["left_ankle"].y];
+
+      // Draw the skeleton
+      drawLine(ctx, joints["left_ear"].x, joints["left_ear"].y, joints["left_eye"].x, joints["left_eye"].y, "lime", 4);
+      drawLine(ctx, joints["left_eye"].x, joints["left_eye"].y, joints["nose"].x, joints["nose"].y, "lime", 4);
+      drawLine(ctx, joints["nose"].x, joints["nose"].y, joints["right_eye"].x, joints["right_eye"].y, "lime", 4);
+      drawLine(ctx, joints["right_eye"].x, joints["right_eye"].y, joints["right_ear"].x, joints["right_ear"].y, "lime", 4);
+
+      drawLine(ctx, joints["left_wrist"].x, joints["left_wrist"].y, joints["left_elbow"].x, joints["left_elbow"].y, "lime", 4);
+      drawLine(ctx, joints["left_elbow"].x, joints["left_elbow"].y, joints["left_shoulder"].x, joints["left_shoulder"].y, "lime", 4);
+
+      drawLine(ctx, joints["right_wrist"].x, joints["right_wrist"].y, joints["right_elbow"].x, joints["right_elbow"].y, "lime", 4);
+      drawLine(ctx, joints["right_elbow"].x, joints["right_elbow"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, "lime", 4);
+
+      drawLine(
+        ctx,
+        joints["left_shoulder"].x,
+        joints["left_shoulder"].y,
+        joints["right_shoulder"].x,
+        joints["right_shoulder"].y,
+        "lime",
+        4
+      );
+      drawLine(ctx, joints["left_hip"].x, joints["left_hip"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+
+      drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
+      drawLine(ctx, joints["right_shoulder"].x, joints["right_shoulder"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+
+      drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
+      drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
+
+      drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_ankle"].x, joints["left_ankle"].y, "lime", 4);
+      drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_ankle"].x, joints["right_ankle"].y, "lime", 4);
+
+      // Draw the joints
+      for (let id of Object.keys(joints)) {
+        let p = joints[id];
+        drawCircle(ctx, p.x, p.y, 5);
+        body[p.name] = p;
+      }
+
+      drawCircle(ctx, neck.x, neck.y, 5);
+      drawCircle(ctx, dick.x, dick.y, 5);
+      drawCircle(ctx, knee.x, knee.y, 5);
+      drawCircle(ctx, foot.x, foot.y, 5);
+
+      drawLine(ctx, nose.x, nose.y, neck.x, neck.y, "white", 8);
+      drawLine(ctx, neck.x, neck.y, dick.x, dick.y, "white", 8);
+      drawLine(ctx, dick.x, dick.y, knee.x, knee.y, "white", 8);
+      drawLine(ctx, knee.x, knee.y, foot.x, foot.y, "white", 8);
     }
-
-    // SKELETON
-
-    let nose = {
-      x: body["nose"].x,
-      y: body["nose"].y,
-    };
-
-    let neck = {
-      x: (body["left_shoulder"].x + body["right_shoulder"].x) / 2,
-      y: (body["left_shoulder"].y + body["right_shoulder"].y) / 2,
-    };
-    neckArray.push(neck.y);
-
-    let dick = {
-      x: (body["left_hip"].x + body["right_hip"].x) / 2,
-      y: (body["left_hip"].y + body["right_hip"].y) / 2,
-    };
-
-    let knee = {
-      x: (body["left_knee"].x + body["right_knee"].x) / 2,
-      y: (body["left_knee"].y + body["right_knee"].y) / 2,
-    };
-
-    let foot = {
-      x: (body["left_ankle"].x + body["right_ankle"].x) / 2,
-      y: (body["left_ankle"].y + body["right_ankle"].y) / 2,
-    };
-
-    // Plank / Pushup
-
-    let xSpine = [body["left_shoulder"].x, body["left_hip"].x, body["left_knee"].x, body["left_ankle"].x];
-    let ySpine = [body["left_shoulder"].y, body["left_hip"].y, body["left_knee"].y, body["left_ankle"].y];
-
-    // Draw the skeleton
-    drawLine(ctx, joints["left_ear"].x, joints["left_ear"].y, joints["left_eye"].x, joints["left_eye"].y, "lime", 4);
-    drawLine(ctx, joints["left_eye"].x, joints["left_eye"].y, joints["nose"].x, joints["nose"].y, "lime", 4);
-    drawLine(ctx, joints["nose"].x, joints["nose"].y, joints["right_eye"].x, joints["right_eye"].y, "lime", 4);
-    drawLine(ctx, joints["right_eye"].x, joints["right_eye"].y, joints["right_ear"].x, joints["right_ear"].y, "lime", 4);
-
-    drawLine(ctx, joints["left_wrist"].x, joints["left_wrist"].y, joints["left_elbow"].x, joints["left_elbow"].y, "lime", 4);
-    drawLine(ctx, joints["left_elbow"].x, joints["left_elbow"].y, joints["left_shoulder"].x, joints["left_shoulder"].y, "lime", 4);
-
-    drawLine(ctx, joints["right_wrist"].x, joints["right_wrist"].y, joints["right_elbow"].x, joints["right_elbow"].y, "lime", 4);
-    drawLine(ctx, joints["right_elbow"].x, joints["right_elbow"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, "lime", 4);
-
-    drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["right_shoulder"].x, joints["right_shoulder"].y, "lime", 4);
-    drawLine(ctx, joints["left_hip"].x, joints["left_hip"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
-
-    drawLine(ctx, joints["left_shoulder"].x, joints["left_shoulder"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
-    drawLine(ctx, joints["right_shoulder"].x, joints["right_shoulder"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
-
-    drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_hip"].x, joints["left_hip"].y, "lime", 4);
-    drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_hip"].x, joints["right_hip"].y, "lime", 4);
-
-    drawLine(ctx, joints["left_knee"].x, joints["left_knee"].y, joints["left_ankle"].x, joints["left_ankle"].y, "lime", 4);
-    drawLine(ctx, joints["right_knee"].x, joints["right_knee"].y, joints["right_ankle"].x, joints["right_ankle"].y, "lime", 4);
-
-    // Draw the joints
-    for (let id of Object.keys(joints)) {
-      let p = joints[id];
-      drawCircle(ctx, p.x, p.y, 5);
-      body[p.name] = p;
-    }
-
-    drawCircle(ctx, neck.x, neck.y, 5);
-    drawCircle(ctx, dick.x, dick.y, 5);
-    drawCircle(ctx, knee.x, knee.y, 5);
-    drawCircle(ctx, foot.x, foot.y, 5);
-
-    drawLine(ctx, nose.x, nose.y, neck.x, neck.y, "white", 8);
-    drawLine(ctx, neck.x, neck.y, dick.x, dick.y, "white", 8);
-    drawLine(ctx, dick.x, dick.y, knee.x, knee.y, "white", 8);
-    drawLine(ctx, knee.x, knee.y, foot.x, foot.y, "white", 8);
   }
 
   // Video loop
@@ -243,8 +249,8 @@ const Game: React.FC = () => {
   return (
     <>
       GAME
-      <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1, top: 30 }}></canvas>
-      <video autoPlay id="video" style={{ width: "300px", height: "300px", transform: "rotateY(180deg)", position: "absolute" }} />
+      <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>
+      <video autoPlay id="video" style={{ width: "600px", height: "480px", transform: "rotateY(180deg)", position: "absolute" }} />
     </>
   );
 };
