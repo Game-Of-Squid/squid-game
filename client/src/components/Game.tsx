@@ -79,8 +79,6 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
   const ctx = canvas.getContext("2d");
 
-  let joints: { [key: string]: any } = {};
-
   // Update function
   async function update() {
     if (!canvas || !video || !ctx) {
@@ -94,7 +92,8 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
     for (const pose of poses) {
       let points = pose.keypoints;
-      let body: { [key: string]: poseDetection.Keypoint } = {};
+      const body: { [key: string]: poseDetection.Keypoint } = {};
+      const joints: { [key: string]: any } = {};
 
       // Convert points to body joints
 
@@ -119,7 +118,6 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
       }
 
       // SKELETON
-
       let nose = {
         x: body["nose"].x,
         y: body["nose"].y,
@@ -145,11 +143,6 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
         x: (body["left_ankle"].x + body["right_ankle"].x) / 2,
         y: (body["left_ankle"].y + body["right_ankle"].y) / 2,
       };
-
-      // Plank / Pushup
-
-      let xSpine = [body["left_shoulder"].x, body["left_hip"].x, body["left_knee"].x, body["left_ankle"].x];
-      let ySpine = [body["left_shoulder"].y, body["left_hip"].y, body["left_knee"].y, body["left_ankle"].y];
 
       // Draw the skeleton
       drawLine(ctx, joints["left_ear"].x, joints["left_ear"].y, joints["left_eye"].x, joints["left_eye"].y, "lime", 4);
