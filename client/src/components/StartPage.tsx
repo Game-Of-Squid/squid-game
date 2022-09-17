@@ -28,7 +28,7 @@ const StartPage: React.FC = () => {
 
         <p>The Calamari Contest of Fun with Guns! Can you make it to the end? </p>
 
-        <button onClick={handleClick} className="play-button">
+        <button onClick={handleClick} id="enter-button">
           Enter the Game
         </button>
       </div>

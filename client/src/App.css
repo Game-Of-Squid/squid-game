@@ -64,17 +64,25 @@
   width: 70%;
 }
 
-.play-button {
+#enter-button {
   background-color: #e82a80; /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
+  display: inline-block;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 16px;
   border-radius: 50px;
   width: 50%;
+}
+
+#button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 5%;
 }
 
 .play-button {
@@ -84,13 +92,11 @@
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 16px;
   border-radius: 50px;
-  width: 50%;
 }
 
-.play-button:hover {
+button:hover {
   transition: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transform: scale(1.02);

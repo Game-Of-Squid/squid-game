@@ -21,12 +21,47 @@ const defaultHeight = 480;
 let greenLight = true;
 let initialized = true;
 
+let video: HTMLVideoElement;
+let detector: poseDetection.PoseDetector;
+
+function initGame() {
+  // Video loop
+  var fps = 1000;
+  var now;
+  var then = performance.now();
+  var interval = 1000 / fps;
+  (window as any).delta = 0;
+
+  function loop() {
+    if (!initialized) return;
+
+    requestAnimationFrame(loop);
+
+    now = performance.now();
+    (window as any).delta = now - then;
+
+    if ((window as any).delta > interval) {
+      then = now - ((window as any).delta % interval);
+      update();
+    }
+  }
+  if (initialized) {
+    loop();
+  }
+}
+
 // Update function
-async function update(canvas: HTMLCanvasElement, video: HTMLVideoElement, detector: poseDetection.PoseDetector) {
+async function update() {
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d");
 
-  if (!canvas || !video || !ctx) {
-    console.error("Unable to get canvas or video element");
+  if (!canvas || !ctx) {
+    console.error("Canvas not found");
+    return;
+  }
+
+  if (!video) {
+    drawText(ctx, "Loading webcam...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
     return;
   }
 
@@ -71,54 +106,34 @@ async function update(canvas: HTMLCanvasElement, video: HTMLVideoElement, detect
   drawText(ctx, "# of poses: " + poses.length, 10, 70);
 }
 
-export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
+export async function startPosing(canvas_: HTMLCanvasElement, video_: HTMLVideoElement) {
   await tf.ready();
 
   const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking: true };
-  const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
+  detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
 
-  if (!canvas || !video) {
+  if (!canvas_ || !video_) {
     console.error("Unable to get canvas or video element");
     return;
   }
 
-  canvas.width = 600;
-  canvas.height = 480;
+  //? We could change this in the future
+  canvas_.width = 600;
+  canvas_.height = 480;
 
-  // Video loop
-  var fps = 1000;
-  var now;
-  var then = performance.now();
-  var interval = 1000 / fps;
-  (window as any).delta = 0;
-
-  function loop() {
-    if (!initialized) return;
-
-    requestAnimationFrame(loop);
-
-    now = performance.now();
-    (window as any).delta = now - then;
-
-    if ((window as any).delta > interval) {
-      then = now - ((window as any).delta % interval);
-
-      update(canvas, video, detector);
-    }
-  }
-  if (initialized) {
-    loop();
-  }
+  video = video_;
 }
 
 const Game: React.FC = () => {
   const [isGreen, setIsGreen] = useState(true);
+  const [isStarted, setIsStarted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    initializeCamera();
-
     initialized = true;
+
+    initializeCamera();
+    initGame();
 
     return () => {
       initialized = false;
@@ -130,8 +145,12 @@ const Game: React.FC = () => {
     greenLight = !greenLight;
   };
 
+  const startGame = () => {
+    setIsStarted(!isStarted);
+  };
+
   return (
-    <div className="game" style={{ backgroundColor: isGreen ? "green" : "red" }}>
+    <div className="game" style={{ backgroundColor: isStarted ? (isGreen ? "green" : "red") : "#132228" }}>
       <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} />
 
       <h1>Game In Action</h1>
@@ -139,9 +158,16 @@ const Game: React.FC = () => {
         <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>
         <video autoPlay id="video" style={{ width: "600px", height: "480px", transform: "rotateY(180deg)", position: "absolute" }} />
       </div>
-      <button onClick={switchColour} className="play-button">
-        Switch Color (we can change this button to just a key down event)
-      </button>
+      <div id="button-container" style={{ width: "500px" }}>
+        <button onClick={startGame} className="play-button">
+          {isStarted ? "Stop Game" : "Start Game"}
+        </button>
+        {isStarted && (
+          <button onClick={switchColour} className="play-button">
+            Switch Color (Spacebar)
+          </button>
+        )}
+      </div>
     </div>
   );
 };
