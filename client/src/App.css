@@ -96,6 +96,10 @@
   border-radius: 50px;
 }
 
+button:focus {
+  outline: none;
+}
+
 button:hover {
   transition: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

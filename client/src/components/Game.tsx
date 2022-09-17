@@ -35,7 +35,7 @@ const Game: React.FC = () => {
     if (!game.greenLight) {
       // take a snapshot of all the poses
 
-      console.log("taking snapshot");
+      game.takeSnapshot();
     }
 
     playAudio(game.greenLight);
@@ -46,7 +46,7 @@ const Game: React.FC = () => {
     () => {
       switchColour();
     },
-    { preventDefault: false, handler: "keyup" }
+    { preventDefault: true, handler: "keyup" }
   );
 
   const startGame = () => {
@@ -54,6 +54,10 @@ const Game: React.FC = () => {
 
     if (!isStarted) {
       playAudio(game.greenLight);
+    } else {
+      // TODO: stop the game
+      game.greenLight = true;
+      setIsGreen(true);
     }
   };
 

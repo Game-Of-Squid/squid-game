@@ -75,31 +75,31 @@ export function drawLine(
   ctx.closePath();
 }
 
-export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any, depth: number) {
+export function drawPose(ctx: CanvasRenderingContext2D, joints: any, depth: number) {
   // SKELETON
   let nose = {
-    x: body["nose"].x,
-    y: body["nose"].y,
+    x: joints["nose"].x,
+    y: joints["nose"].y,
   };
 
   let neck = {
-    x: (body["left_shoulder"].x + body["right_shoulder"].x) / 2,
-    y: (body["left_shoulder"].y + body["right_shoulder"].y) / 2,
+    x: (joints["left_shoulder"].x + joints["right_shoulder"].x) / 2,
+    y: (joints["left_shoulder"].y + joints["right_shoulder"].y) / 2,
   };
 
   let dick = {
-    x: (body["left_hip"].x + body["right_hip"].x) / 2,
-    y: (body["left_hip"].y + body["right_hip"].y) / 2,
+    x: (joints["left_hip"].x + joints["right_hip"].x) / 2,
+    y: (joints["left_hip"].y + joints["right_hip"].y) / 2,
   };
 
   let knee = {
-    x: (body["left_knee"].x + body["right_knee"].x) / 2,
-    y: (body["left_knee"].y + body["right_knee"].y) / 2,
+    x: (joints["left_knee"].x + joints["right_knee"].x) / 2,
+    y: (joints["left_knee"].y + joints["right_knee"].y) / 2,
   };
 
   let foot = {
-    x: (body["left_ankle"].x + body["right_ankle"].x) / 2,
-    y: (body["left_ankle"].y + body["right_ankle"].y) / 2,
+    x: (joints["left_ankle"].x + joints["right_ankle"].x) / 2,
+    y: (joints["left_ankle"].y + joints["right_ankle"].y) / 2,
   };
 
   // Draw the skeleton
@@ -130,7 +130,6 @@ export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any, 
   for (let id of Object.keys(joints)) {
     let p = joints[id];
     drawCircle(ctx, p.x, p.y, 5);
-    body[p.name] = p;
   }
 
   drawCircle(ctx, neck.x, neck.y, 5);
@@ -143,5 +142,5 @@ export function drawPose(ctx: CanvasRenderingContext2D, joints: any, body: any, 
   drawLine(ctx, dick.x, dick.y, knee.x, knee.y, "white", 8);
   drawLine(ctx, knee.x, knee.y, foot.x, foot.y, "white", 8);
 
-  drawText(ctx, Math.round(depth) + " cm", nose.x, nose.y + 10 - 20 / (depth / 100), undefined, "white", "center");
+  drawText(ctx, Math.round(depth) + " cm", nose.x, nose.y + 10 - 20 / (depth / 100), undefined, "aqua", "center");
 }
