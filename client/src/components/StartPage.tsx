@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 
 const logo = require("../assets/images/squidlogo.png");
 
-const StartPage = () => {
+const StartPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleClick = (e: any) => {
@@ -31,11 +31,12 @@ const StartPage = () => {
         <button onClick={handleClick} className="play-button">
           Enter the Game
         </button>
-      </div>
-      <div className="eyeballs">
-        <div className="wrap">
-          <div className="eye double-blink"></div>
-          <div className="eye double-blink"></div>
+
+        <div className="eyeballs">
+          <div className="wrap">
+            <div className="eye up"></div>
+            <div className="eye double-blink"></div>
+          </div>
         </div>
       </div>
     </div>

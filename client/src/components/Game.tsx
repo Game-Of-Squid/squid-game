@@ -7,6 +7,24 @@ import Ola from "ola";
 import { useState } from "react";
 import { drawPose, drawText } from "../lib/helper";
 
+const getAngle = (lShoulder: number, rShoulder: number): number => {
+  const xCenter: number = 300;
+  const fullWidth: number = 600;
+
+  const shoulderDist: number = lShoulder - rShoulder;
+  const shoulderMiddle: number = (lShoulder + rShoulder) / 2;
+
+  let depth: number = 67544 * Math.pow(Math.abs(shoulderDist), -1.31);
+
+  const avgShoulder: number = 35;
+
+  const distFromMiddle: number = ((xCenter - shoulderMiddle) / shoulderDist) * avgShoulder;
+
+  const angle: number = Math.atan(distFromMiddle / depth) * (180 / Math.PI);
+
+  return angle;
+};
+
 const defaultWidth = 640;
 const defaultHeight = 480;
 
@@ -58,6 +76,11 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
     }
 
     let poses = await detector.estimatePoses(video);
+
+    // console.log(poses)
+
+    const angle = getAngle(poses[0].keypoints[5].x, poses[0].keypoints[6].x);
+    console.log(angle);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
