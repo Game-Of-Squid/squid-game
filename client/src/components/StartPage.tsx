@@ -14,6 +14,7 @@ const StartPage = () => {
     const handleClick = (e: any) => {
         e.preventDefault();
         navigate('/?path=/game')
+        //Implement switching to game using Link component?
     }
   return (
     <div className='rows'>
