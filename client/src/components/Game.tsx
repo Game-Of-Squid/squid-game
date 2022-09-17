@@ -10,6 +10,7 @@ import { io } from "socket.io-client";
 import { getAngle } from "../lib/angle";
 import initializeCamera from "../lib/camera";
 import { useNavigate } from "react-router";
+import { initKeys, onKey } from "kontra";
 
 const socket = io("http://localhost:3030");
 
@@ -26,11 +27,11 @@ let detector: poseDetection.PoseDetector;
 
 function playAudio() {
   if (greenLight) {
-    // var audio = new Audio("http://localhost:3000/greenlight.mp3");
-    var audio = new Audio("http://localhost:3000/koreangreen.mp3");
+    var audio = new Audio("http://localhost:3000/greenlight.mp3");
+    // let audio = new Audio("http://localhost:3000/koreangreen.mp3");
     audio.play();
   } else {
-    var audio = new Audio("http://localhost:3000/redlight.mp3");
+    let audio = new Audio("http://localhost:3000/redlight.mp3");
     audio.play();
   }
 }
@@ -143,6 +144,7 @@ const Game: React.FC = () => {
   useEffect(() => {
     initialized = true;
 
+    initKeys(); // initalize keyboard input
     initializeCamera();
     initGame();
 
@@ -152,11 +154,27 @@ const Game: React.FC = () => {
   }, []);
 
   const switchColour = () => {
+    if (!isStarted) return;
+
     setIsGreen(!isGreen);
     greenLight = !greenLight;
 
+    if (!greenLight) {
+      // take a snapshot of all the poses
+
+      console.log("taking snapshot");
+    }
+
     playAudio();
   };
+
+  onKey(
+    "space",
+    () => {
+      switchColour();
+    },
+    { preventDefault: false, handler: "keyup" }
+  );
 
   const startGame = () => {
     setIsStarted(!isStarted);
@@ -168,7 +186,7 @@ const Game: React.FC = () => {
 
   return (
     <div className="game" style={{ backgroundColor: isStarted ? (isGreen ? "green" : "red") : "#132228" }}>
-      <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} />
+      <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} alt="" />
 
       <h1>Game In Action</h1>
       <div className="video">

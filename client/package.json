@@ -19,6 +19,7 @@
     "@types/node": "^16.11.59",
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
+    "kontra": "^8.0.0",
     "ola": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

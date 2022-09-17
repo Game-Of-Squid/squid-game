@@ -1,6 +1,6 @@
 export const getAngle = (lShoulder: number, rShoulder: number) => {
   const xCenter: number = 300;
-  const fullWidth: number = 600;
+  // const fullWidth: number = 600;
 
   const shoulderDist: number = lShoulder - rShoulder;
   const shoulderMiddle: number = (lShoulder + rShoulder) / 2;
