@@ -17,6 +17,9 @@ export default function initializeCamera() {
     .getUserMedia({ video: true })
     .then(function (stream) {
       video.srcObject = stream;
+      return new Promise((resolve) => (video.onplaying = resolve));
+    })
+    .then(() => {
       startPosing(canvas, video);
     })
     .catch(function (err0r) {

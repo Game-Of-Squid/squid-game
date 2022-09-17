@@ -123,14 +123,6 @@
   height: 480px;
 }
 
-.green {
-  background-color: green;
-}
-
-.red {
-  background-color: red;
-}
-
 #logo:hover {
   cursor: pointer;
 }

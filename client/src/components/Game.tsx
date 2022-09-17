@@ -21,6 +21,56 @@ const defaultHeight = 480;
 let greenLight = true;
 let initialized = true;
 
+// Update function
+async function update(canvas: HTMLCanvasElement, video: HTMLVideoElement, detector: poseDetection.PoseDetector) {
+  const ctx = canvas.getContext("2d");
+
+  if (!canvas || !video || !ctx) {
+    console.error("Unable to get canvas or video element");
+    return;
+  }
+
+  let poses = await detector.estimatePoses(video);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (const pose of poses) {
+    let points = pose.keypoints;
+
+    const angle = getAngle(points[5].x, points[6].x);
+    if (!greenLight) {
+      socket.emit("angle", angle);
+    }
+
+    const body: { [key: string]: poseDetection.Keypoint } = {};
+    const joints: { [key: string]: any } = {};
+
+    // Convert points to body joints
+    for (const p of points) {
+      if (!p.name) continue;
+      const id = p.name;
+
+      p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
+      p.y = p.y * (canvas.height / defaultHeight);
+      body[id] = p;
+
+      if (joints[id]) {
+        joints[id].x = body[id].x;
+        joints[id].y = body[id].y;
+      } else {
+        joints[id] = Ola({ x: body[id].x, y: body[id].y }, 50);
+      }
+    }
+
+    // Draw joints
+    drawPose(ctx, joints, body);
+  }
+
+  // Draw stats
+  drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
+  drawText(ctx, "# of poses: " + poses.length, 10, 70);
+}
+
 export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
   await tf.ready();
 
@@ -34,56 +84,6 @@ export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoEle
 
   canvas.width = 600;
   canvas.height = 480;
-
-  const ctx = canvas.getContext("2d");
-
-  // Update function
-  async function update() {
-    if (!canvas || !video || !ctx) {
-      console.error("Unable to get canvas or video element");
-      return;
-    }
-
-    let poses = await detector.estimatePoses(video);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (const pose of poses) {
-      let points = pose.keypoints;
-
-      const angle = getAngle(points[5].x, points[6].x);
-      if (!greenLight) {
-        socket.emit("angle", angle);
-      }
-
-      const body: { [key: string]: poseDetection.Keypoint } = {};
-      const joints: { [key: string]: any } = {};
-
-      // Convert points to body joints
-      for (const p of points) {
-        if (!p.name) continue;
-        const id = p.name;
-
-        p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
-        p.y = p.y * (canvas.height / defaultHeight);
-        body[id] = p;
-
-        if (joints[id]) {
-          joints[id].x = body[id].x;
-          joints[id].y = body[id].y;
-        } else {
-          joints[id] = Ola({ x: body[id].x, y: body[id].y }, 50);
-        }
-      }
-
-      // Draw joints
-      drawPose(ctx, joints, body);
-    }
-
-    // Draw stats
-    drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
-    drawText(ctx, "# of poses: " + poses.length, 10, 70);
-  }
 
   // Video loop
   var fps = 1000;
@@ -103,7 +103,7 @@ export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoEle
     if ((window as any).delta > interval) {
       then = now - ((window as any).delta % interval);
 
-      update();
+      update(canvas, video, detector);
     }
   }
   if (initialized) {
@@ -131,7 +131,7 @@ const Game: React.FC = () => {
   };
 
   return (
-    <div className={`game ${isGreen ? "green" : "red"}`}>
+    <div className="game" style={{ backgroundColor: isGreen ? "green" : "red" }}>
       <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} />
 
       <h1>Game In Action</h1>
