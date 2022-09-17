@@ -7,6 +7,8 @@ import { useEffect } from "react";
 
 import Ola from "ola";
 
+import { useState } from "react";
+
 function drawCircle(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -239,12 +241,21 @@ const Game: React.FC = () => {
     }
   }, []);
 
+  const [isGreen, setIsGreen] = useState(true);
+
+  const switchColour = () => {
+    setIsGreen(!isGreen);
+  }
+
   return (
-    <>
-      GAME
-      <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>
-      <video autoPlay id="video" style={{ width: "600px", height: "480px", transform: "rotateY(180deg)", position: "absolute" }} />
-    </>
+    <div className={`game ${isGreen ? 'green' : 'red'}`}>
+      <h1>Game In Action</h1>
+      <div className='video'>
+        <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>
+        <video autoPlay id="video" style={{ width: "600px", height: "480px", transform: "rotateY(180deg)", position: "absolute" }} />
+      </div>
+      <button onClick={switchColour} className='play-button'>Switch Color (we can change this button to just a key down event)</button>
+    </div>
   );
 };
 

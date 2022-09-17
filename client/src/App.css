@@ -100,3 +100,28 @@
   transition-duration: 150ms;
   cursor: pointer;
 }
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 600px;
+  height: 480px;
+}
+
+.green {
+  background-color: green;
+}
+
+.red {
+  background-color: red;
+}
