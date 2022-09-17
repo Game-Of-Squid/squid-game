@@ -11,6 +11,7 @@ import { getAngle } from "../lib/angle";
 import initializeCamera from "../lib/camera";
 import { useNavigate } from "react-router";
 import { initKeys, onKey } from "kontra";
+import playAudio from "../lib/audio";
 
 const socket = io("http://localhost:3030");
 
@@ -24,17 +25,6 @@ let initialized = true;
 
 let video: HTMLVideoElement;
 let detector: poseDetection.PoseDetector;
-
-function playAudio() {
-  if (greenLight) {
-    var audio = new Audio("http://localhost:3000/greenlight.mp3");
-    // let audio = new Audio("http://localhost:3000/koreangreen.mp3");
-    audio.play();
-  } else {
-    let audio = new Audio("http://localhost:3000/redlight.mp3");
-    audio.play();
-  }
-}
 
 function initGame() {
   // Video loop
@@ -62,25 +52,7 @@ function initGame() {
   }
 }
 
-// Update function
-async function update() {
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-  const ctx = canvas.getContext("2d");
-
-  if (!canvas || !ctx) {
-    console.error("Canvas not found");
-    return;
-  }
-
-  if (!video) {
-    drawText(ctx, "Loading camera...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
-    return;
-  }
-
-  let poses = await detector.estimatePoses(video);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+function drawPoses(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, poses: poseDetection.Pose[]) {
   for (const pose of poses) {
     let points = pose.keypoints;
 
@@ -112,13 +84,35 @@ async function update() {
     // Draw joints
     drawPose(ctx, joints, body, depth);
   }
+}
+
+// Update function
+async function update() {
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d");
+
+  if (!canvas || !ctx) {
+    console.error("Canvas not found");
+    return;
+  }
+
+  if (!video) {
+    drawText(ctx, "Loading camera...", canvas.width / 2, canvas.height / 2, "50px Arial", "white", "center", "middle");
+    return;
+  }
+
+  let poses = await detector.estimatePoses(video);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawPoses(ctx, canvas, poses);
 
   // Draw stats
   drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 30, undefined, "white", "left", "top");
   drawText(ctx, "# of poses: " + poses.length, 10, 60, undefined, "white", "left", "top");
 }
 
-export async function startPosing(canvas_: HTMLCanvasElement, video_: HTMLVideoElement) {
+export async function initializePoseDetection(canvas_: HTMLCanvasElement, video_: HTMLVideoElement) {
   await tf.ready();
 
   const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking: true };
@@ -165,7 +159,7 @@ const Game: React.FC = () => {
       console.log("taking snapshot");
     }
 
-    playAudio();
+    playAudio(greenLight);
   };
 
   onKey(
@@ -180,7 +174,7 @@ const Game: React.FC = () => {
     setIsStarted(!isStarted);
 
     if (!isStarted) {
-      playAudio();
+      playAudio(greenLight);
     }
   };
 
