@@ -5,6 +5,7 @@
   "dependencies": {
     "@tensorflow-models/pose-detection": "^2.0.0",
     "@tensorflow/tfjs-backend-wasm": "^3.20.0",
+    "@tensorflow/tfjs-backend-webgl": "^3.20.0",
     "@tensorflow/tfjs-converter": "^3.20.0",
     "@tensorflow/tfjs-core": "^3.20.0",
     "@testing-library/jest-dom": "^5.16.5",
@@ -14,6 +15,7 @@
     "@types/node": "^16.11.59",
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
+    "ola": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.4.0",
@@ -45,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/ola": "^1.2.0"
   }
 }
