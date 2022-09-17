@@ -31,12 +31,12 @@ const StartPage: React.FC = () => {
         <button onClick={handleClick} className="play-button">
           Enter the Game
         </button>
+      </div>
 
-        <div className="eyeballs">
-          <div className="wrap">
-            <div className="eye up"></div>
-            <div className="eye double-blink"></div>
-          </div>
+      <div className="eyeballs">
+        <div className="wrap">
+          <div className="eye up"></div>
+          <div className="eye double-blink"></div>
         </div>
       </div>
     </div>
