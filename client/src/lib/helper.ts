@@ -1,3 +1,29 @@
+export function drawText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  font?: string | Object,
+  color?: string,
+  align?: string,
+  baseline?: string,
+  alpha?: number
+) {
+  let options: { [key: string]: any } = {};
+  if (font instanceof Object) {
+    options = font;
+  }
+  ctx.beginPath();
+  ctx.font = options.font || font || "20px Arial";
+  ctx.fillStyle = options.color || color || "red";
+  ctx.textAlign = options.align || align || "default";
+  ctx.globalAlpha = alpha || 1;
+  ctx.textBaseline = options.baseline || baseline || "default";
+  ctx.fillText(text, x, y);
+  ctx.globalAlpha = 1;
+  ctx.closePath();
+}
+
 export function drawCircle(
   ctx: CanvasRenderingContext2D,
   x: number,

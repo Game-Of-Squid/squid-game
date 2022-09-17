@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import Ola from "ola";
 
 import { useState } from "react";
-import { drawPose } from "../lib/helper";
+import { drawPose, drawText } from "../lib/helper";
 
 const defaultWidth = 640;
 const defaultHeight = 480;
@@ -83,6 +83,9 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
       // Draw joints
       drawPose(ctx, joints, body);
+
+      // Draw stats
+      drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
     }
   }
 
