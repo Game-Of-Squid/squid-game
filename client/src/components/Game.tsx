@@ -24,6 +24,17 @@ let initialized = true;
 let video: HTMLVideoElement;
 let detector: poseDetection.PoseDetector;
 
+function playAudio() {
+  if (greenLight) {
+    // var audio = new Audio("http://localhost:3000/greenlight.mp3");
+    var audio = new Audio("http://localhost:3000/koreangreen.mp3");
+    audio.play();
+  } else {
+    var audio = new Audio("http://localhost:3000/redlight.mp3");
+    audio.play();
+  }
+}
+
 function initGame() {
   // Video loop
   var fps = 1000;
@@ -143,10 +154,16 @@ const Game: React.FC = () => {
   const switchColour = () => {
     setIsGreen(!isGreen);
     greenLight = !greenLight;
+
+    playAudio();
   };
 
   const startGame = () => {
     setIsStarted(!isStarted);
+
+    if (!isStarted) {
+      playAudio();
+    }
   };
 
   return (
