@@ -9,13 +9,17 @@ import { drawPose, drawText } from "../lib/helper";
 import { io } from "socket.io-client";
 import { getAngle } from "../lib/angle";
 import initializeCamera from "../lib/camera";
+import { useNavigate } from "react-router";
 
 const socket = io("http://localhost:3030");
+
+const logo = require("../assets/images/squidgamelogo.png");
 
 const defaultWidth = 640;
 const defaultHeight = 480;
 
 let greenLight = true;
+let initialized = true;
 
 export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
   await tf.ready();
@@ -89,6 +93,8 @@ export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoEle
   (window as any).delta = 0;
 
   function loop() {
+    if (!initialized) return;
+
     requestAnimationFrame(loop);
 
     now = performance.now();
@@ -100,15 +106,24 @@ export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoEle
       update();
     }
   }
-  loop();
+  if (initialized) {
+    loop();
+  }
 }
 
 const Game: React.FC = () => {
+  const [isGreen, setIsGreen] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
     initializeCamera();
-  }, []);
 
-  const [isGreen, setIsGreen] = useState(true);
+    initialized = true;
+
+    return () => {
+      initialized = false;
+    };
+  }, []);
 
   const switchColour = () => {
     setIsGreen(!isGreen);
@@ -117,6 +132,8 @@ const Game: React.FC = () => {
 
   return (
     <div className={`game ${isGreen ? "green" : "red"}`}>
+      <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} />
+
       <h1>Game In Action</h1>
       <div className="video">
         <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>

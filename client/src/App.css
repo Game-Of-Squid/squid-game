@@ -37,7 +37,6 @@
   }
 }
 
-
 .start-page {
   display: flex;
   flex-direction: column;
@@ -95,7 +94,8 @@
   transition: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transform: scale(1.02);
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   cursor: pointer;
@@ -107,11 +107,11 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  position:absolute;
-  top:0px;
-  right:0px;
-  bottom:0px;
-  left:0px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
 }
 
 .video {
@@ -129,4 +129,8 @@
 
 .red {
   background-color: red;
+}
+
+#logo:hover {
+  cursor: pointer;
 }
