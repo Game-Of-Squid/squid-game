@@ -6,53 +6,18 @@ import { useEffect } from "react";
 import Ola from "ola";
 import { useState } from "react";
 import { drawPose, drawText } from "../lib/helper";
+import { io } from "socket.io-client";
+import { getAngle } from "../lib/angle";
+import initializeCamera from "../lib/camera";
 
-const getAngle = (lShoulder: number, rShoulder: number): number => {
-  const xCenter: number = 300;
-  const fullWidth: number = 600;
-
-  const shoulderDist: number = lShoulder - rShoulder;
-  const shoulderMiddle: number = (lShoulder + rShoulder) / 2;
-
-  let depth: number = 67544 * Math.pow(Math.abs(shoulderDist), -1.31);
-
-  const avgShoulder: number = 35;
-
-  const distFromMiddle: number = ((xCenter - shoulderMiddle) / shoulderDist) * avgShoulder;
-
-  const angle: number = Math.atan(distFromMiddle / depth) * (180 / Math.PI);
-
-  return angle;
-};
+const socket = io("http://localhost:3030");
 
 const defaultWidth = 640;
 const defaultHeight = 480;
 
-function initializeCamera() {
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-  const video = document.getElementById("video") as HTMLVideoElement;
+let greenLight = true;
 
-  if (!canvas || !video) {
-    console.error("Canvas or video element not found");
-    return;
-  }
-  if (!navigator.mediaDevices.getUserMedia) {
-    console.error("getUserMedia() is not supported by your browser");
-    return;
-  }
-
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
-      startPosing(canvas, video);
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
-
-async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
+export async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
   await tf.ready();
 
   const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking: true };
@@ -77,15 +42,16 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
     let poses = await detector.estimatePoses(video);
 
-    // console.log(poses)
-
-    const angle = getAngle(poses[0].keypoints[5].x, poses[0].keypoints[6].x);
-    console.log(angle);
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (const pose of poses) {
       let points = pose.keypoints;
+
+      const angle = getAngle(points[5].x, points[6].x);
+      if (!greenLight) {
+        socket.emit("angle", angle);
+      }
+
       const body: { [key: string]: poseDetection.Keypoint } = {};
       const joints: { [key: string]: any } = {};
 
@@ -146,6 +112,7 @@ const Game: React.FC = () => {
 
   const switchColour = () => {
     setIsGreen(!isGreen);
+    greenLight = !greenLight;
   };
 
   return (
