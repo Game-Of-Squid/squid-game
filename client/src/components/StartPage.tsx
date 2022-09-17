@@ -2,6 +2,7 @@ import React from 'react'
 import SquareOutlinedIcon from '@mui/icons-material/SquareOutlined';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import ChangeHistoryOutlinedIcon from '@mui/icons-material/ChangeHistoryOutlined';
+
 import './eye.css'
 import { useNavigate } from 'react-router';
 
@@ -32,7 +33,9 @@ const StartPage = () => {
 
         <p>The Calamari Contest of Fun with Guns! Can you make it to the end? </p>
 
-        <button onClick={handleClick} className='play-button'>Play Now</button>
+        <button onClick={handleClick} className='play-button'>
+            Enter the Game 
+        </button>
 
 
 
