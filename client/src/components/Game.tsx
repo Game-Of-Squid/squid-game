@@ -3,9 +3,7 @@ import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 // import "@tensorflow/tfjs-backend-wasm";
 import { useEffect } from "react";
-
 import Ola from "ola";
-
 import { useState } from "react";
 import { drawPose, drawText } from "../lib/helper";
 
@@ -16,25 +14,30 @@ function initializeCamera() {
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   const video = document.getElementById("video") as HTMLVideoElement;
 
-  if (canvas && video) {
-    if (navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then(function (stream) {
-          video.srcObject = stream;
-          startPosing(canvas, video);
-        })
-        .catch(function (err0r) {
-          console.log("Something went wrong!");
-        });
-    }
+  if (!canvas || !video) {
+    console.error("Canvas or video element not found");
+    return;
   }
+  if (!navigator.mediaDevices.getUserMedia) {
+    console.error("getUserMedia() is not supported by your browser");
+    return;
+  }
+
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then(function (stream) {
+      video.srcObject = stream;
+      startPosing(canvas, video);
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
 }
 
 async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
   await tf.ready();
 
-  const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING };
+  const detectorConfig = { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking: true };
   const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
 
   if (!canvas || !video) {
@@ -66,13 +69,12 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
       // Convert points to body joints
       for (const p of points) {
         if (!p.name) continue;
+        const id = p.name;
+
         p.x = (canvas.width - p.x - (canvas.width - defaultWidth)) * (canvas.width / defaultWidth);
         p.y = p.y * (canvas.height / defaultHeight);
-        body[p.name] = p;
-      }
+        body[id] = p;
 
-      // Joints
-      for (let id of Object.keys(body)) {
         if (joints[id]) {
           joints[id].x = body[id].x;
           joints[id].y = body[id].y;
@@ -83,23 +85,24 @@ async function startPosing(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
 
       // Draw joints
       drawPose(ctx, joints, body);
-
-      // Draw stats
-      drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
     }
+
+    // Draw stats
+    drawText(ctx, "FPS: " + Math.round(10000 / (window as any).delta) / 10, 10, 40);
+    drawText(ctx, "# of poses: " + poses.length, 10, 70);
   }
 
   // Video loop
   var fps = 1000;
   var now;
-  var then = Date.now();
+  var then = performance.now();
   var interval = 1000 / fps;
   (window as any).delta = 0;
 
   function loop() {
     requestAnimationFrame(loop);
 
-    now = Date.now();
+    now = performance.now();
     (window as any).delta = now - then;
 
     if ((window as any).delta > interval) {
