@@ -6,6 +6,7 @@ import { initKeys, onKey } from "kontra";
 import playAudio from "../lib/audio";
 
 import game from "../Game";
+import { MS_TO_SNAPSHOT } from "../constants";
 
 const logo = require("../assets/images/squidgamelogo.png");
 
@@ -39,7 +40,7 @@ const Game: React.FC = () => {
 
       setTimeout(() => {
         game.takeSnapshot();
-      }, 1500);
+      }, MS_TO_SNAPSHOT);
     }
 
     playAudio(game.greenLight);

@@ -1,3 +1,4 @@
+import { MIN_SCORE, THRESHOLD_MULTIPLIER } from "./constants";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
@@ -40,7 +41,7 @@ export class Game {
   }
 
   calculateThreshold(depth: number): number {
-    return (-5 / 4) * (depth / 100) + 15;
+    return ((-5 / 4) * (depth / 100) + 15) * THRESHOLD_MULTIPLIER;
   }
 
   checkThreshold() {
@@ -66,7 +67,7 @@ export class Game {
 
         // check if the distance is greater than the threshold
         // discard result if the predicted score for the keypoint is too low
-        if (dist > threshold && (newPoint.score || 0) > 0.2) {
+        if (dist > threshold && (newPoint.score || 0) > MIN_SCORE) {
           (pose as any).dead = true;
           console.log(`Player ${id} DEAD | Keypoint: ${newPoint.name}`);
           socket.emit("angle", angle);
