@@ -7,6 +7,7 @@ import playAudio from "../lib/audio";
 
 import game from "../Game";
 import { MS_TO_SNAPSHOT } from "../constants";
+import { write } from "fs";
 
 const logo = require("../assets/images/squidgamelogo.png");
 
@@ -26,12 +27,34 @@ async function initPort() {
 }
 
 export const sendData = async (angle: number) => {
-  const writer = port.writable.getWriter();
-  const data = new Int8Array([angle])
-  await writer.write(data);
-  console.log('The angle has been send: ' + angle)
-  // Allow the serial port to be closed later.
-  writer.releaseLock();
+  // const writer = port.writable.getWriter();
+  // const data = new ArrayBuffer(3)
+  // console.log(data)
+  // await writer.write(data);
+  // console.log('The angle has been send: ' + angle)
+  // // Allow the serial port to be closed later.
+  // writer.releaseLock();
+
+  const textEncoder = new TextEncoderStream();
+  const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+  const writer = textEncoder.writable.getWriter();
+
+  const textDecoder = new TextDecoderStream();
+  const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+  const reader = textDecoder.readable.getReader();
+
+
+  await writer.write("3");
+  
+  reader.cancel();
+  await readableStreamClosed.catch(() => { /* Ignore the error */ });
+
+  writer.close();
+  
+  await writableStreamClosed;
+  
+  // await port.close();
+
 };
 
 const endConnection = async () => {
