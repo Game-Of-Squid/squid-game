@@ -11,8 +11,17 @@ const logo = require("../assets/images/squidlogo.png");
 const StartPage: React.FC = () => {
   const navigate = useNavigate();
 
+//   if ("serial" in navigator) {
+//     console.log(navigator.serial)
+//     // The Web Serial API is supported.
+//   }
+
+  
+
+
   const handleClick = (e: any) => {
     e.preventDefault();
+    
     navigate("/game");
   };
   return (

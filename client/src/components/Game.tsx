@@ -27,6 +27,27 @@ const Game: React.FC = () => {
     };
   }, []);
 
+
+    //Serial Port Functions
+
+  let port = (navigator as any).serial.requestPort();
+    port.open({
+    baudRate: 9600
+  });
+
+  const sendData = async (angle: number) => {
+    const writer = port.writable.getWriter();
+    
+    await writer.write(angle);
+    // Allow the serial port to be closed later.
+    writer.releaseLock();
+  }
+
+  
+
+
+  //Game Logic
+
   const switchColour = () => {
     if (!isStarted) return;
 
@@ -65,6 +86,13 @@ const Game: React.FC = () => {
       setIsGreen(true);
     }
   };
+
+
+
+
+  
+
+  
 
   return (
     <div className="game" style={{ backgroundColor: isStarted ? (isGreen ? "green" : "red") : "#132228" }}>
