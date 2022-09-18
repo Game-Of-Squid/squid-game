@@ -33,6 +33,10 @@ export const sendData = async (angle: number) => {
   writer.releaseLock();
 };
 
+const endConnection = async () => {
+  await port.close();
+}
+
 const Game: React.FC = () => {
   const [isGreen, setIsGreen] = useState(true);
   const [isStarted, setIsStarted] = useState(false);
@@ -120,6 +124,10 @@ const Game: React.FC = () => {
         <button onClick={initPort} className="play-button">
           Connect to Arduino
         </button>
+        <button onClick={endConnection} className='play-button'>Close Port</button>
+        <button onClick={() => {
+          console.log(port)
+        }} className='play-button'>Print Port</button>
       </div>
     </div>
   );
