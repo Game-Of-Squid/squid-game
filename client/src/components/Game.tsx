@@ -29,12 +29,12 @@ async function initPort() {
 export const sendData = async (angle: number) => {
   // const writer = port.writable.getWriter();
   // const data = new ArrayBuffer(3)
-  // console.log(data)
+  // console.log(data)git 
   // await writer.write(data);
   // console.log('The angle has been send: ' + angle)
   // // Allow the serial port to be closed later.
   // writer.releaseLock();
-
+  console.log('The angle is ' + angle)
   const textEncoder = new TextEncoderStream();
   const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
   const writer = textEncoder.writable.getWriter();
@@ -44,7 +44,8 @@ export const sendData = async (angle: number) => {
   const reader = textDecoder.readable.getReader();
 
 
-  await writer.write("3");
+  let value = angle.toString();
+  await writer.write(value);
   
   reader.cancel();
   await readableStreamClosed.catch(() => { /* Ignore the error */ });
