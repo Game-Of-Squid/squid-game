@@ -27,8 +27,9 @@ async function initPort() {
 
 export const sendData = async (angle: number) => {
   const writer = port.writable.getWriter();
-
-  await writer.write(angle);
+  const data = new Int8Array([angle])
+  await writer.write(data);
+  console.log('The angle has been send: ' + angle)
   // Allow the serial port to be closed later.
   writer.releaseLock();
 };
