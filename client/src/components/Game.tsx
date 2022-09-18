@@ -104,7 +104,7 @@ const Game: React.FC = () => {
         <canvas id="canvas" width="500" height="500" style={{ position: "absolute", zIndex: 1 }}></canvas>
         <video autoPlay id="video" style={{ width: "600px", height: "480px", transform: "rotateY(180deg)", position: "absolute" }} />
       </div>
-      <div id="button-container" style={{ width: "500px" }}>
+      <div id="button-container" style={{ width: "600px" }}>
         <button onClick={startGame} className="play-button">
           {isStarted ? "Stop Game" : "Start Game"}
         </button>

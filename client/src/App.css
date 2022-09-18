@@ -13,6 +13,14 @@
   }
 }
 
+/* Fonts */
+
+@font-face {
+  font-family: "GameOfSquid";
+  src: url("./assets/gameofsquid.ttf");
+  font-display: fallback;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -68,13 +76,13 @@
   background-color: #e82a80; /* Green */
   border: none;
   color: white;
-  padding: 15px 32px;
+  padding: 15px 16px;
   display: inline-block;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
-  border-radius: 50px;
-  width: 50%;
+  border-radius: 20px;
+  font-family: "GameOfSquid";
 }
 
 #button-container {
@@ -89,11 +97,12 @@
   background-color: #e82a80; /* Green */
   border: none;
   color: white;
-  padding: 15px 32px;
+  padding: 15px 16px;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
-  border-radius: 50px;
+  border-radius: 20px;
+  font-family: "GameOfSquid";
 }
 
 button:focus {
