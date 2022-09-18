@@ -1,16 +1,13 @@
 //Initialize SerialPort
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
+const SerialPort = require("serialport");
+const Readline = require("@serialport/parser-readline");
 
-
-const port = new SerialPort('COM3', {baudRate: 9600});
+const port = new SerialPort("COM3", { baudRate: 9600 });
 
 const parser = new Readline();
 port.pipe(parser);
 
 // parser.on('data', (line) => console.log(line));
-
-
 
 // Initialize server variables
 const express = require("express");
@@ -56,7 +53,7 @@ io.on("connection", function (socket) {
   console.log("Connection made", new Date());
 
   socket.on("angle", (angle) => {
-    console.log('Sending angle to serial port');
+    console.log("Sending angle to serial port");
     port.write(angle);
   });
 

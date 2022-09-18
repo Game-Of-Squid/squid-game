@@ -84,6 +84,14 @@ const Game: React.FC = () => {
             Switch Color (Spacebar)
           </button>
         )}
+
+        <button
+          onClick={() => {
+            game.sendTest();
+          }}
+          className="play-button">
+          Test
+        </button>
       </div>
     </div>
   );

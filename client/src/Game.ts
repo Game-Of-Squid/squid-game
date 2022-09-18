@@ -190,6 +190,10 @@ export class Game {
       drawPose(ctx, joints, depth, dead);
     }
   }
+
+  sendTest() {
+    socket.emit("angle", (Math.random() - 0.5) * 2 * 45);
+  }
 }
 
 const game = new Game();
