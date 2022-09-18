@@ -48,7 +48,7 @@ io.on("connection", function (socket) {
     let options = {
       mode: "text",
       pythonOptions: ["-u"], // get print results in real-time
-      // args: [event.file.name, studentName]
+      args: [angle],
     };
 
     PythonShell.run("./main.py", options, function (err, results) {
