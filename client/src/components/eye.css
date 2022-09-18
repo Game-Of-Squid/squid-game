@@ -248,4 +248,5 @@ html, body {
   transform: scale(3);
   align-items: center;
   justify-content: center;
+  margin-left: 10%;
 }

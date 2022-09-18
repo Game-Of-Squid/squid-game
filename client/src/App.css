@@ -52,7 +52,7 @@
 .sg-icons {
   margin-top: 25px;
   transform: scale(3);
-  padding: 3%;
+  padding: 4%;
 }
 
 .title-header {
@@ -61,7 +61,8 @@
 
 .logo-image {
   margin-top: 1%;
-  width: 70%;
+  margin-right: 100px;
+  width: 84%;
 }
 
 #enter-button {

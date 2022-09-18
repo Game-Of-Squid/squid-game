@@ -6,7 +6,7 @@ import ChangeHistoryOutlinedIcon from "@mui/icons-material/ChangeHistoryOutlined
 import "./eye.css";
 import { useNavigate } from "react-router";
 
-const logo = require("../assets/images/squidlogo.png");
+const logo = require("../assets/images/webver.png");
 
 const StartPage: React.FC = () => {
   const navigate = useNavigate();
