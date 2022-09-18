@@ -13,12 +13,16 @@ const logo = require("../assets/images/squidgamelogo.png");
 // Serial Port Functions
 
 let port: any;
-function initPort() {
-  port = (navigator as any).serial.requestPort().then((port: any) => {
-    port.open({
+async function initPort() {
+  if ("serial" in navigator) {
+    port = await (navigator as any).serial.requestPort();
+
+    console.log(port);
+
+    await port.open({
       baudRate: 9600,
     });
-  });
+  }
 }
 
 export const sendData = async (angle: number) => {
