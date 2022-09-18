@@ -194,7 +194,9 @@ export class Game {
   }
 
   sendTest() {
-    socket.emit("angle", (Math.random() - 0.5) * 2 * 45);
+    const randomAngle = (Math.random() - 0.5) * 2 * 45;
+    socket.emit("angle", randomAngle);
+    sendData(randomAngle);
   }
 }
 
