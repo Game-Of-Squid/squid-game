@@ -123,7 +123,7 @@ const Game: React.FC = () => {
         </button>
 
         <button onClick={initPort} className="play-button">
-          Connect to Arduino
+          Connect
         </button>
         <button onClick={endConnection} className='play-button'>Close Port</button>
         <button onClick={() => {
