@@ -20,8 +20,8 @@ const io = require("socket.io")(server, {
   },
 });
 
-// const spawn = require("child_process").spawn;
-// let { PythonShell } = require("python-shell");
+const spawn = require("child_process").spawn;
+let { PythonShell } = require("python-shell");
 
 // Listen to port
 const serverPort = process.env.PORT || 3030;
@@ -43,7 +43,19 @@ io.on("connection", function (socket) {
 
   socket.on("angle", (angle) => {
     console.log("Sending angle to serial port");
-    port.write(angle);
+    // port.write(angle);
+
+    let options = {
+      mode: "text",
+      pythonOptions: ["-u"], // get print results in real-time
+      // args: [event.file.name, studentName]
+    };
+
+    PythonShell.run("./main.py", options, function (err, results) {
+      if (err) throw err;
+      // results is an array consisting of messages collected during execution
+      console.log(results);
+    });
   });
 
   socket.on("disconnect", () => {});

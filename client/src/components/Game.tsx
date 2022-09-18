@@ -26,17 +26,17 @@ async function initPort() {
 }
 
 export const sendData = async (angle: number) => {
-  const writer = port.writable.getWriter();
-  const data = new Int8Array([angle])
-  await writer.write(data);
-  console.log('The angle has been send: ' + angle)
-  // Allow the serial port to be closed later.
-  writer.releaseLock();
+  // const writer = port.writable.getWriter();
+  // const data = new Int8Array([angle]);
+  // await writer.write(data);
+  // console.log("The angle has been send: " + angle);
+  // // Allow the serial port to be closed later.
+  // writer.releaseLock();
 };
 
 const endConnection = async () => {
   await port.close();
-}
+};
 
 const Game: React.FC = () => {
   const [isGreen, setIsGreen] = useState(true);
@@ -122,13 +122,13 @@ const Game: React.FC = () => {
           Test
         </button>
 
-        <button onClick={initPort} className="play-button">
+        {/* <button onClick={initPort} className="play-button">
           Connect
-        </button>
-        <button onClick={endConnection} className='play-button'>Close Port</button>
+        </button> */}
+        {/* <button onClick={endConnection} className='play-button'>Close Port</button>
         <button onClick={() => {
           console.log(port)
-        }} className='play-button'>Print Port</button>
+        }} className='play-button'>Print Port</button> */}
       </div>
     </div>
   );
