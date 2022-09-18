@@ -10,6 +10,25 @@ import { MS_TO_SNAPSHOT } from "../constants";
 
 const logo = require("../assets/images/squidgamelogo.png");
 
+// Serial Port Functions
+
+let port: any;
+function initPort() {
+  port = (navigator as any).serial.requestPort().then((port: any) => {
+    port.open({
+      baudRate: 9600,
+    });
+  });
+}
+
+export const sendData = async (angle: number) => {
+  const writer = port.writable.getWriter();
+
+  await writer.write(angle);
+  // Allow the serial port to be closed later.
+  writer.releaseLock();
+};
+
 const Game: React.FC = () => {
   const [isGreen, setIsGreen] = useState(true);
   const [isStarted, setIsStarted] = useState(false);
@@ -27,27 +46,7 @@ const Game: React.FC = () => {
     };
   }, []);
 
-
-    //Serial Port Functions
-
-  let port = (navigator as any).serial.requestPort();
-    port.open({
-    baudRate: 9600
-  });
-
-  const sendData = async (angle: number) => {
-    const writer = port.writable.getWriter();
-    
-    await writer.write(angle);
-    // Allow the serial port to be closed later.
-    writer.releaseLock();
-  }
-
-  
-
-
-  //Game Logic
-
+  // Game Logic
   const switchColour = () => {
     if (!isStarted) return;
 
@@ -87,13 +86,6 @@ const Game: React.FC = () => {
     }
   };
 
-
-
-
-  
-
-  
-
   return (
     <div className="game" style={{ backgroundColor: isStarted ? (isGreen ? "green" : "red") : "#132228" }}>
       <img id="logo" src={logo} style={{ width: 100, position: "absolute", left: 10, top: 10 }} onClick={() => navigate("/")} alt="" />
@@ -119,6 +111,10 @@ const Game: React.FC = () => {
           }}
           className="play-button">
           Test
+        </button>
+
+        <button onClick={initPort} className="play-button">
+          Connect to Arduino
         </button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { sendData } from "./components/Game";
 import { MIN_SCORE, THRESHOLD_MULTIPLIER } from "./constants";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as tf from "@tensorflow/tfjs-core";
@@ -71,6 +72,7 @@ export class Game {
           (pose as any).dead = true;
           console.log(`Player ${id} DEAD | Keypoint: ${newPoint.name}`);
           socket.emit("angle", angle);
+          sendData(angle);
 
           break;
         }
